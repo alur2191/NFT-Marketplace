@@ -5,6 +5,7 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
+
 const threeDChain = {
   id: 44787,
   name: "Celo Alfajores Testnet",
