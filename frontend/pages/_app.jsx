@@ -4,7 +4,7 @@ import "../styles/globals.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
-
+import { wrapper } from "../store/store";
 
 const threeDChain = {
   id: 44787,
@@ -62,4 +62,4 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-export default MyApp
+export default wrapper.withRedux(MyApp)

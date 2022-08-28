@@ -5,13 +5,17 @@ import { Physics, usePlane } from "@react-three/cannon"
 import { RepeatWrapping } from 'three'
 import { User } from '../components/threeD/user/User';
 import Building from '../components/threeD/building/Building'
-import { createClient } from "urql";
+import { createClient as createUrqlClient } from "urql";
 import { SUBGRAPH_URL } from "../constants";
-import { useAccount } from "wagmi";
+import { configureChains, useAccount, WagmiConfig, createClient } from "wagmi";
 import Nft from "../components/threeD/nft/Nft"
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
+import { getDefaultWallets } from '@rainbow-me/rainbowkit'
+import { useSelector } from 'react-redux'
+import { selectUserState } from '../store/userSlice'
+import Username from '../components/threeD/user/Username'
 
 function Plane() {
-  
   const [ref] = usePlane(()=>({
     rotation: [-Math.PI / 2,0,0],
     position:[0,0,0]
@@ -33,11 +37,60 @@ function Plane() {
   )
 }
 
+const threeDChain = {
+  id: 44787,
+  name: "Celo Alfajores Testnet",
+  network: "alfajores",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Celo",
+    symbol: "CELO",
+  },
+  rpcUrls: {
+    default: "https://alfajores-forno.celo-testnet.org",
+  },
+  blockExplorers: {
+    default: {
+      name: "celoScan",
+      url: "https://alfajores.celoscan.io",
+    },
+  },
+  testnet: true,
+};
+
+
+
+const { chains, provider } = configureChains(
+  [threeDChain],
+  [
+    jsonRpcProvider({
+      rpc: (chain) => {
+        if (chain.id !== threeDChain.id) return null;
+        return { http: chain.rpcUrls.default };
+      },
+    }),
+  ]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: "ThreeD NFT Marketplace",
+  chains,
+});
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider,
+});
+
+
 function threeD() {
 	 // State variables to contain active listings and signify a loading state
 	const [listings, setListings] = useState();
 	const [loading, setLoading] = useState(false);
 	const { isConnected } = useAccount();
+
+	const userState = useSelector(selectUserState);
 
 	// Function to fetch listings from the subgraph
 	async function fetchListings() {
@@ -57,7 +110,7 @@ function threeD() {
 		`;
 
 		// Create a urql client
-		const urqlClient = createClient({
+		const urqlClient = createUrqlClient({
 			url: SUBGRAPH_URL,
 		});
 
@@ -80,8 +133,15 @@ function threeD() {
 		}
 	}, []);
   const cursorRef = useRef()
+
 	if(loading && isConnected || !listings) {
 		<span style={{fontSize:50}}>Loading...</span>
+	} else if (!userState){
+		return(
+			<>
+				<Username />
+			</>
+		)
 	} else {
 		return (
 			<>
@@ -102,12 +162,14 @@ function threeD() {
 					/>
 					<Physics gravity={[0, -30, 0]} >
 						<Building cursorRef={cursorRef} listings={listings}/>
-						{listings&&listings.map((listing,i)=>{
-							return (
-								<Nft  key={i} listing={listing} i={i} />
-							)
-						})}
-						<User position={[15, 2, 10]} />
+						<WagmiConfig client={wagmiClient}>
+							{listings&&listings.map((listing,i)=>{
+								return (
+									<Nft  key={i} listing={listing} posZ={(i+1)*10-10} />
+								)
+							})}
+						</WagmiConfig>
+						<User position={[15, 2, 10]} username={userState}/>
 						<Plane />
 					</Physics>
 				</Canvas>

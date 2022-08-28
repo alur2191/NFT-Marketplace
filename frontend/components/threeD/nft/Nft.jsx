@@ -1,17 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
+import { useBox } from "@react-three/cannon"
 import { useAccount, useContract, useProvider, erc721ABI } from "wagmi";
-import styles from "./Listing.module.scss";
-import { formatEther } from "ethers/lib/utils";
+import { useTexture } from '@react-three/drei';
 
-interface ListingProps {
-	nftAddress: string;
-	seller: string;
-	tokenId: string;
-	price: number;
-}
-
-export default function Listing(props: ListingProps) {
-  // State variables to hold information about the NFT
+const Nft =({posZ, listing})=>{
+	const [hovered, setHovered] = useState(false)
+	const [refPainting] = useBox(() => ({ mass:0, position: [posZ-10,6,-18]}))
+	
+	// State variables to hold information about the NFT
   const [imageURI, setImageURI] = useState("");
   const [name, setName] = useState("");
 
@@ -23,13 +19,13 @@ export default function Listing(props: ListingProps) {
   const provider = useProvider();
   const { address } = useAccount();
   const ERC721Contract = useContract({
-    addressOrName: props.nftAddress,
+    addressOrName: listing.nftAddress,
     contractInterface: erc721ABI,
     signerOrProvider: provider,
   });
 
   // Check if the NFT seller is the connected user
-  const isOwner = address?.toLowerCase() === props.seller.toLowerCase();
+  const isOwner = address?.toLowerCase() === listing.seller.toLowerCase();
 
   // Fetch NFT details by resolving the token URI
   async function fetchNFTDetails() {
@@ -47,44 +43,44 @@ export default function Listing(props: ListingProps) {
       let image = metadataJSON.imageUrl;
       // If it's an IPFS URI, replace it with an HTTP Gateway link
       image = image.replace("ipfs://", "https://ipfs.io/ipfs/");
-			console.log("inside function",image);
+
       // Update state variables
       setName(metadataJSON.name);
+			console.log(image);
       setImageURI(image);
-			
       setLoading(false);
     } catch (error) {
       console.error(error);
       setLoading(false);
     }
   }
-	// console.log("outside function",imageURI);
-
+	
+	// const imgTexture = useTexture(imageURI || './image/wall.jpg')
   // Fetch the NFT details when component is loaded
   useEffect(() => {
     fetchNFTDetails();
   }, []);
+	
+	console.log(imageURI.replace('https://ipfsgateway.makersplace.com/ipfs/', 'https://gateway.moralisipfs.com/ipfs/'))
 
-  return (
-    <div>
-      {loading ? (
-        <span>Loading...</span>
-      ) : (
-        <div className={styles.card}>
-          <img src={imageURI} />
-          <div className={styles.container}>
-            <span>
-              <b>
-                {name} - #{props.tokenId}
-              </b>
-            </span>
-            <span>Price: {formatEther(props.price)} CELO</span>
-            <span>
-              Seller: {isOwner ? "You" : props.seller.substring(0, 6) + "..."}
-            </span>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+	const imgTexture = useTexture(imageURI.replace('https://ipfsgateway.makersplace.com/ipfs/', 'https://gateway.moralisipfs.com/ipfs/') || '/image/floor.jpg')
+	if(!imageURI && !posZ){
+		return(
+			<mesh></mesh>
+		)
+	}else{
+		return(
+				<>
+						<mesh 
+								onPointerOver={() => setHovered(true)}
+								onPointerOut={() => setHovered(false)}
+								ref={refPainting}>
+								<planeBufferGeometry attach="geometry" args={[5, 4]} />
+								<meshBasicMaterial attach="material" map={imgTexture} toneMapped={false} />
+						</mesh>
+				</>
+		)
+	}
 }
+
+export default Nft

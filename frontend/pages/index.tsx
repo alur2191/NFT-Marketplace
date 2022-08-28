@@ -7,6 +7,7 @@ import Link from "next/link";
 import { SUBGRAPH_URL } from "../constants";
 import { useAccount } from "wagmi";
 
+
 type ListingObject = {
   [key: string]: string | number;
   buyer: string;
@@ -22,7 +23,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const { isConnected } = useAccount();
-
   // Function to fetch listings from the subgraph
   async function fetchListings() {
     setLoading(true);
@@ -102,3 +102,4 @@ export default function Home() {
     </>
   );
 }
+
