@@ -24,7 +24,7 @@ export default function Username() {
             <input type="text" name="username" onChange={onChange} value={username} />
           </label>
         </div>
-        <input type="submit" value="Create Concept" />
+        <input type="submit" value="Enter" />
       </form>
     </div>
   );
