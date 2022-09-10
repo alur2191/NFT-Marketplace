@@ -134,7 +134,7 @@ function threeD() {
 	}, []);
   const cursorRef = useRef()
 
-	if(loading && isConnected || !listings) {
+	if(loading ) {
 		<span style={{fontSize:50}}>Loading...</span>
 	} else if (!userState){
 		return(
@@ -162,13 +162,16 @@ function threeD() {
 					/>
 					<Physics gravity={[0, -30, 0]} >
 						<Building cursorRef={cursorRef} listings={listings}/>
-						<WagmiConfig client={wagmiClient}>
-							{listings&&listings.map((listing,i)=>{
-								return (
-									<Nft  key={i} listing={listing} posZ={(i+1)*10-10} />
-								)
-							})}
-						</WagmiConfig>
+						{isConnected ?
+							<WagmiConfig client={wagmiClient}>
+								{listings&&listings.map((listing,i)=>{
+									return (
+										<Nft  key={i} listing={listing} posZ={(i+1)*10-10} />
+									)
+								})}
+							</WagmiConfig> 
+							: null
+						}
 						<User position={[15, 2, 10]} username={userState}/>
 						<Plane />
 					</Physics>

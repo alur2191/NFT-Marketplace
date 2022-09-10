@@ -57,7 +57,7 @@ export const User = (props) => {
     return (
     <>
         <ViewControls />
-				<SocketConnection posX={camera.position.x} posY={camera.position.y-4} posZ={camera.position.z} username={props.username} />
+				{/* <SocketConnection posX={camera.position.x} posY={camera.position.y-4} posZ={camera.position.z} username={props.username} /> */}
         {/* <mesh ref={ref}>
             <sphereBufferGeometry args={[1, 16, 16]} />
 						<meshBasicMaterial color="black" attach="material" />
