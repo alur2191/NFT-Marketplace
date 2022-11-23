@@ -1,5 +1,7 @@
 ﻿# NFT-Marketplace
 
+![NFT Marketplace](https://github.com/dandavisjs/NFT-Marketplace/blob/socketio/nftmarket.gif)
+
 3D NFT marketplace in a browser. Side project that I revisit every few months when I have spare time. Feel free to reach out if you would like to join the fun and help me building this [alur2191@gmail.com](mailto:alur2191@gmail.com)
 
 I thought of working on this a few years ago when I was looking into [Solidity](https://docs.soliditylang.org/en/v0.8.17/) and [Three.js](https://threejs.org/). I took some time to make the [3D environment](https://github.com/dandavisjs/3dGallery) at the time, and part of it is being used in this repo.
